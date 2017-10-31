@@ -6,6 +6,7 @@
 
 <script>
 import _ from 'lodash'
+import moment from 'moment'
 import axios from 'axios'
 import ChartComponent from '@/components/ChartComponent'
 
@@ -25,7 +26,7 @@ export default {
       let chartLabels = _.map(resArray[0].data, (data, key) => {
         let date = new Date(key);
 
-        return date.getMonth() + '-' + date.getDate();
+        return moment(key).format('MM-DD'); ;
       });
       let datasets = [];
 
@@ -43,8 +44,6 @@ export default {
       resArray.forEach((res) => {
         let year = null;
         let data = _.map(res.data, (value, key) => {
-
-          // console.log('key', key);
           if (!year) {
             year = new Date(key).getFullYear();
           }
@@ -72,7 +71,6 @@ export default {
       };
 
       this.chartOptions = {
-        maintainAspectRatio: false,
         scales: {
           yAxes: [{
             stacked: true,
@@ -105,8 +103,8 @@ export default {
   },
 
   mounted() {
-
     console.log('HomeComponent - mounted:', this.chartOptions);
+
     this.chartOptions = this.chartOptions;
   }
 }

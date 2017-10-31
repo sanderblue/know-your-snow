@@ -56,6 +56,7 @@ export default {
   data() {
     return {
       defaultOptions: {
+        maintainAspectRatio: false,
         legend: {
           display: true,
           position: 'left'
@@ -87,25 +88,20 @@ export default {
     max-width: 90vw;
     margin: 0 auto;
     overflow: hidden;
-    /*position: relative;
-    width: 3000px;
-    height: 400px;*/
   }
 
   .chart-window {
-    /*height: 400px;*/
     width: auto;
     overflow-x: scroll;
   }
 
   .chart-frame {
     position: relative;
-    width: 3000px;
-    height: 300px;
+    width: 2000px;
+    height: 400px;
   }
 
   canvas {
-    /*width: 3000px;*/
-    /*height: 300px;*/
+
   }
 </style>

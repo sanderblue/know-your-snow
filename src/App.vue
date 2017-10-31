@@ -7,6 +7,7 @@
 <script>
 console.clear(); // FOR DEBUGGING
 console.log(new Date().getMilliseconds());
+
 export default {
   name: 'app'
 }
