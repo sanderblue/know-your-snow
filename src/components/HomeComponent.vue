@@ -10,40 +10,66 @@ import moment from 'moment'
 import axios from 'axios'
 import ChartComponent from '@/components/ChartComponent'
 
+const colorMap = {
+  meadows: getRandomColor(),
+  timberline: getRandomColor(),
+  skibowl: getRandomColor(),
+};
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+
+  return color;
+}
+
 export default {
   name: 'HomeComponent',
   components: {
     ChartComponent,
   },
 
+  methods: {
+    aggregateChartData(data) {
+      return new Promise((resolve, reject) => {
+
+      });
+    }
+  },
+
   created() {
     Promise.all([
-      axios.get('/static/data/mt-hood-meadows/mt-hood-meadows-2014_2015.json'),
-      axios.get('/static/data/mt-hood-meadows/mt-hood-meadows-2015_2016.json'),
-      axios.get('/static/data/mt-hood-meadows/mt-hood-meadows-2016_2017.json')
+      axios.get('/static/data/mt-hood/meadows/2014_2015.json'),
+      axios.get('/static/data/mt-hood/meadows/2015_2016.json'),
+      axios.get('/static/data/mt-hood/meadows/2016_2017.json'),
+      axios.get('/static/data/mt-hood/timberline/2014_2015.json'),
+      axios.get('/static/data/mt-hood/timberline/2015_2016.json'),
+      axios.get('/static/data/mt-hood/timberline/2016_2017.json'),
+      // axios.get('/static/data/mt-hood/skibowl/2014_2015.json'),
+      // axios.get('/static/data/mt-hood/skibowl/2015_2016.json'),
+      // axios.get('/static/data/mt-hood/skibowl/2016_2017.json'),
     ])
     .then(resArray => {
-      let chartLabels = _.map(resArray[0].data, (data, key) => {
+
+      console.log('resArray:', resArray);
+
+      let chartLabels = _.map(resArray[0].data.data, (data, key) => {
         let date = new Date(key);
 
         return moment(key).format('MM-DD'); ;
       });
+
       let datasets = [];
 
-      function getRandomColor() {
-        var letters = '0123456789ABCDEF';
-        var color = '#';
-
-        for (var i = 0; i < 6; i++) {
-          color += letters[Math.floor(Math.random() * 16)];
-        }
-
-        return color;
-      }
-
       resArray.forEach((res) => {
+        console.log('res', res.data.location);
+
         let year = null;
-        let data = _.map(res.data, (value, key) => {
+        let data = _.map(res.data.data, (value, key) => {
           if (!year) {
             year = new Date(key).getFullYear();
           }
@@ -51,15 +77,13 @@ export default {
           return value.avg;
         });
 
-        let color = getRandomColor();
-
         // console.log('Year', year);
 
         datasets.push({
-          label: year,
+          label: `${res.data.location} - ${year}`,
           data: data.reverse(),
           backgroundColor: 'rgba(0,0,0,0)',
-          borderColor: color,
+          borderColor: colorMap[res.data.location],
           borderWidth: 1,
           spanGaps: true
         });
@@ -69,11 +93,15 @@ export default {
         labels: chartLabels.reverse(),
         datasets: datasets
       };
+    });
+  },
 
-      this.chartOptions = {
+  data() {
+    return {
+      chartOptions: {
         scales: {
           yAxes: [{
-            stacked: true,
+            stacked: false,
             gridLines: {
               display: true,
               color: "rgba(255,99,132,0.2)"
@@ -88,14 +116,6 @@ export default {
             }
           }]
         }
-      };
-    });
-  },
-
-  data() {
-    return {
-      chartOptions: {
-
       },
 
       chartData: {}

@@ -56,6 +56,11 @@ export default {
   data() {
     return {
       defaultOptions: {
+        elements: {
+          point: {
+            radius: 2
+          }
+        },
         maintainAspectRatio: false,
         legend: {
           display: true,
@@ -97,8 +102,8 @@ export default {
 
   .chart-frame {
     position: relative;
-    width: 2000px;
-    height: 400px;
+    width: 3000px;
+    height: 500px;
   }
 
   canvas {
