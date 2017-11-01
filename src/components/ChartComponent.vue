@@ -64,7 +64,7 @@ export default {
         maintainAspectRatio: false,
         legend: {
           display: true,
-          position: 'left'
+          position: 'right'
         }
       }
     }
@@ -102,7 +102,7 @@ export default {
 
   .chart-frame {
     position: relative;
-    width: 3000px;
+    /*width: 3000px;*/
     height: 500px;
   }
 

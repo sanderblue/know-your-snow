@@ -1,0 +1,48 @@
+// Load custom Foundation variables
+@import './settings';
+
+// Load Foundation
+@import '~foundation-sites/scss/foundation';
+
+@include foundation-everything($prototype: true);
+
+@import "~font-awesome/css/font-awesome.css";
+
+body {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+}
+
+.app-title,
+.header-main {
+  background-color: rgba(23, 121, 186, 0.9);
+  color: white;
+  height: 4rem;
+  display: table;
+  width: 100%;
+}
+
+.header-inner {
+  height: inherit;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.app-title-text {
+  height: inherit;
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.sidebar {
+  background-color: rgba(0, 0, 0, 0.1);
+  height: 100vh;
+}
+
+.main-content {
+  background-color: white;
+}
