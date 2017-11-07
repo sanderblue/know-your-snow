@@ -73,6 +73,10 @@ export default {
   watch: {
     mountains() {
       console.log('\nHomeComponent mountains changed:', this.mountains);
+
+      let matchedData = _.filter(this.observationData, { location: this.mountains[0] })
+
+      console.log('matchedData:', matchedData, '\n');
     },
 
     years() {
@@ -101,12 +105,18 @@ export default {
     ])
     .then(resArray => {
 
-      // console.log('resArray:', resArray);
+      console.log('resArray:', resArray);
 
-      let chartLabels = _.map(resArray[0].data.data, (data, key) => {
-        let date = new Date(key);
+      let observationData = _.map(resArray, (obj) => {
+        return obj.data;
+      });
 
-        return moment(key).format('MM-DD'); ;
+      this.observationData = _.flatten(observationData);
+
+      console.log('observationData', _.flatten(observationData) );
+
+      let chartLabels = _.map(resArray[0].data, (data, key) => {
+        return data.date;
       });
 
       let datasets = [];
@@ -144,6 +154,7 @@ export default {
 
   data() {
     return {
+      observationData: [],
       chartOptions: {
         scales: {
           yAxes: [{
