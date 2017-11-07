@@ -1,5 +1,7 @@
 <template>
   <div class="home-component">
+    {{ mountains }}
+
     <chart-component :type="'line'" :chartData="chartData" :chartOptions="chartOptions" ></chart-component>
   </div>
 </template>
@@ -9,6 +11,7 @@ import _ from 'lodash'
 import moment from 'moment'
 import axios from 'axios'
 import ChartComponent from '@/components/ChartComponent'
+import { mapGetters, mapActions } from 'vuex'
 
 const colorMap = {
   meadows: getRandomColor(),
@@ -29,10 +32,53 @@ function getRandomColor() {
 
 export default {
   name: 'HomeComponent',
+  props: [
+    // 'mountains',
+    // 'years',
+  ],
+
+  computed: {
+    mountains: {
+      get() {
+
+        console.log('GET MOUNTAINS - HELLS YEAH', this.$store.state.mountains);
+
+        // Now we just need get the chart data based on which mountains are selected
+
+        return this.$store.state.mountains
+      },
+      set(value) {
+        this.$store.commit('updateMountains', value)
+      }
+    }
+  },
+
+  // props: {
+  //   mountains: {
+  //     type: Array,
+  //     default() {
+  //       return [];
+  //     },
+  //   },
+  //   years: {
+  //     type: Array,
+  //     default() {
+  //       return [];
+  //     },
+  //   },
+  // },
   components: {
     ChartComponent,
   },
+  watch: {
+    mountains() {
+      console.log('\nHomeComponent mountains changed:', this.mountains);
+    },
 
+    years() {
+      console.log('\nHomeComponent years changed:', this.years);
+    }
+  },
   methods: {
     aggregateChartData(data) {
       return new Promise((resolve, reject) => {
@@ -55,7 +101,7 @@ export default {
     ])
     .then(resArray => {
 
-      console.log('resArray:', resArray);
+      // console.log('resArray:', resArray);
 
       let chartLabels = _.map(resArray[0].data.data, (data, key) => {
         let date = new Date(key);
@@ -66,7 +112,7 @@ export default {
       let datasets = [];
 
       resArray.forEach((res) => {
-        console.log('res', res.data.location);
+        // console.log('res', res.data.location);
 
         let year = null;
         let data = _.map(res.data.data, (value, key) => {
