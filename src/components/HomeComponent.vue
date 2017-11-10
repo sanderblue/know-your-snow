@@ -14,9 +14,9 @@ import ChartComponent from '@/components/ChartComponent'
 import { mapGetters, mapActions } from 'vuex'
 
 const colorMap = {
-  meadows: getRandomColor(),
-  timberline: getRandomColor(),
-  skibowl: getRandomColor(),
+  MtHoodMeadowsBase: '#003F91', // getRandomColor(),
+  TimberlineLodge: '#57E2E5', // getRandomColor(),
+  SkiBowlSummit: '#5DA9E9', // getRandomColor(),
 };
 
 function getRandomColor() {
@@ -36,23 +36,6 @@ export default {
     // 'mountains',
     // 'years',
   ],
-
-  computed: {
-    mountains: {
-      get() {
-
-        console.log('GET MOUNTAINS - HELLS YEAH', this.$store.state.mountains);
-
-        // Now we just need get the chart data based on which mountains are selected
-
-        return this.$store.state.mountains
-      },
-      set(value) {
-        this.$store.commit('updateMountains', value)
-      }
-    }
-  },
-
   // props: {
   //   mountains: {
   //     type: Array,
@@ -67,6 +50,22 @@ export default {
   //     },
   //   },
   // },
+
+  computed: {
+    mountains: {
+      get() {
+
+        // console.log('GET MOUNTAINS - HELLS YEAH', this.$store.state.mountains);
+
+        // Now we just need get the chart data based on which mountains are selected
+
+        return this.$store.state.mountains
+      },
+      set(value) {
+        this.$store.commit('updateMountains', value)
+      }
+    }
+  },
   components: {
     ChartComponent,
   },
@@ -74,9 +73,46 @@ export default {
     mountains() {
       console.log('\nHomeComponent mountains changed:', this.mountains);
 
-      let matchedData = _.filter(this.observationData, { location: this.mountains[0] })
+      if (!this.mountains.length) {
+        return;
+      }
 
-      console.log('matchedData:', matchedData, '\n');
+      let chartLabels = [];
+      let datasets = [];
+
+      this.mountains.forEach((mtn) => {
+        let matchedData = _.filter(this.observationData, (dataObj) => {
+          return dataObj.location === mtn;
+        });
+
+        matchedData = _.orderBy(matchedData, ['timestamp'], ['desc']);
+
+        if (!chartLabels.length) {
+          chartLabels = _.map(matchedData, (dataObj, key) => {
+            return dataObj.date;
+          });
+        }
+
+        let numericalData = _.map(matchedData, (dataObj) => {
+          return dataObj.averageSnowDepthForDate;
+        });
+
+        datasets.push({
+          label: mtn,
+          data: numericalData.reverse(),
+          backgroundColor: 'rgba(0,0,0,0)',
+          borderColor: colorMap[mtn],
+          borderWidth: 1,
+          spanGaps: true
+        });
+      });
+
+      console.log('chartLabels:', chartLabels);
+
+      this.chartData = {
+        labels: chartLabels.reverse(),
+        datasets: datasets
+      };
     },
 
     years() {
@@ -92,64 +128,71 @@ export default {
   },
 
   created() {
-    Promise.all([
-      axios.get('/static/data/mt-hood/meadows/2014_2015.json'),
-      axios.get('/static/data/mt-hood/meadows/2015_2016.json'),
-      axios.get('/static/data/mt-hood/meadows/2016_2017.json'),
-      axios.get('/static/data/mt-hood/timberline/2014_2015.json'),
-      axios.get('/static/data/mt-hood/timberline/2015_2016.json'),
-      axios.get('/static/data/mt-hood/timberline/2016_2017.json'),
-      // axios.get('/static/data/mt-hood/skibowl/2014_2015.json'),
-      // axios.get('/static/data/mt-hood/skibowl/2015_2016.json'),
-      // axios.get('/static/data/mt-hood/skibowl/2016_2017.json'),
-    ])
-    .then(resArray => {
+    axios.get('/static/data/all/dailyObservationsData.json').then((res) => {
 
-      console.log('resArray:', resArray);
+      console.log('All data:', res.data);
 
-      let observationData = _.map(resArray, (obj) => {
-        return obj.data;
-      });
-
-      this.observationData = _.flatten(observationData);
-
-      console.log('observationData', _.flatten(observationData) );
-
-      let chartLabels = _.map(resArray[0].data, (data, key) => {
-        return data.date;
-      });
-
-      let datasets = [];
-
-      resArray.forEach((res) => {
-        // console.log('res', res.data.location);
-
-        let year = null;
-        let data = _.map(res.data.data, (value, key) => {
-          if (!year) {
-            year = new Date(key).getFullYear();
-          }
-
-          return value.avg;
-        });
-
-        // console.log('Year', year);
-
-        datasets.push({
-          label: `${res.data.location} - ${year}`,
-          data: data.reverse(),
-          backgroundColor: 'rgba(0,0,0,0)',
-          borderColor: colorMap[res.data.location],
-          borderWidth: 1,
-          spanGaps: true
-        });
-      });
-
-      this.chartData = {
-        labels: chartLabels.reverse(),
-        datasets: datasets
-      };
+      this.observationData = res.data;
     });
+
+    // Promise.all([
+    //   axios.get('/static/data/mt-hood/meadows/2014_2015.json'),
+    //   axios.get('/static/data/mt-hood/meadows/2015_2016.json'),
+    //   axios.get('/static/data/mt-hood/meadows/2016_2017.json'),
+    //   axios.get('/static/data/mt-hood/timberline/2014_2015.json'),
+    //   axios.get('/static/data/mt-hood/timberline/2015_2016.json'),
+    //   axios.get('/static/data/mt-hood/timberline/2016_2017.json'),
+    //   // axios.get('/static/data/mt-hood/skibowl/2014_2015.json'),
+    //   // axios.get('/static/data/mt-hood/skibowl/2015_2016.json'),
+    //   // axios.get('/static/data/mt-hood/skibowl/2016_2017.json'),
+    // ])
+    // .then(resArray => {
+
+    //   console.log('resArray:', resArray);
+
+    //   let observationData = _.map(resArray, (obj) => {
+    //     return obj.data;
+    //   });
+
+    //   this.observationData = _.flatten(observationData);
+
+    //   console.log('observationData', _.flatten(observationData) );
+
+    //   let chartLabels = _.map(resArray[0].data, (data, key) => {
+    //     return data.date;
+    //   });
+
+    //   let datasets = [];
+
+    //   resArray.forEach((res) => {
+    //     // console.log('res', res.data.location);
+
+    //     let year = null;
+    //     let data = _.map(res.data.data, (value, key) => {
+    //       if (!year) {
+    //         year = new Date(key).getFullYear();
+    //       }
+
+    //       return value.avg;
+    //     });
+
+    //     // console.log('Year', year);
+
+    //     datasets.push({
+    //       label: `${res.data.location} - ${year}`,
+    //       data: data.reverse(),
+    //       backgroundColor: 'rgba(0,0,0,0)',
+    //       borderColor: colorMap[res.data.location],
+    //       borderWidth: 1,
+    //       spanGaps: true
+    //     });
+    //   });
+
+    //   this.chartData = {
+    //     labels: chartLabels.reverse(),
+    //     datasets: datasets
+    //   };
+    // });
   },
 
   data() {

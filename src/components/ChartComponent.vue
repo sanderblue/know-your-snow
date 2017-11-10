@@ -39,6 +39,8 @@ export default {
 
   watch: {
     chartData() {
+      console.log('WATCH - chartData:', this.chartData);
+
       // console.log('WATCH - chartOptions:', this.options);
       // console.log('WATCH - this.chart:', this.chartVue);
 
