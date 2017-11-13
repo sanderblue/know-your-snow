@@ -11,27 +11,23 @@
         <aside class="sidebar padding-2">
           <ul class="vertical menu">
             <li>
-              <h5>Mountain</h5>
+              <h5>Mountains</h5>
               <ul class="nested vertical menu padding-bottom-1">
                 <li>
                   <input id="meadows" type="checkbox" value="MtHoodMeadowsBase" v-model="mountains">
-                  <!-- <input id="meadows" type="checkbox" value="MtHoodMeadowsBase" @change="onChangeMountainSelection"> -->
                   <label for="meadows">Mt. Hood Meadows</label>
                 </li>
                 <li>
                   <input id="timberline" type="checkbox" value="TimberlineLodge" v-model="mountains">
-                  <!-- <input id="skibowl" type="checkbox" value="TimberlineLodge" @change="onChangeMountainSelection"> -->
                   <label for="timberline">Mt. Hood Timberline</label>
                 </li>
                 <li>
                   <input id="skibowl" type="checkbox" value="SkiBowlSummit" v-model="mountains">
-                  <!-- <input id="skibowl" type="checkbox" value="SkiBowlSummit" @change="onChangeMountainSelection"> -->
                   <label for="skibowl">Mt. Hood Ski Bowl</label>
                 </li>
-                <li>{{ mountains }}</li>
               </ul>
             </li>
-            <li>
+            <!-- <li>
               <h5>Years</h5>
               <ul class="nested vertical menu padding-bottom-1">
                 <li>
@@ -52,17 +48,20 @@
                 </li>
                 <li>{{ years }}</li>
               </ul>
-            </li>
+            </li> -->
             <li>
               <h5>Date Range</h5>
               <ul class="nested vertical menu padding-bottom-1">
                 <li class="row collapse">
-                  <label class="small-8 columns">Start Date
-                    <input type="text" placeholder="Start Date">
-                  </label>
-                  <label class="small-8 columns">End Date
-                    <input type="text" placeholder="End Date">
-                  </label>
+                  <form v-on:submit.prevent="onSubmitDateRange">
+                    <div class="input-group">
+                      <input class="input-group-field" name="startDate" type="text" placeholder="Start Date" :value="startDate">
+                      <input class="input-group-field" name="endDate" type="text" placeholder="End Date" :value="endDate">
+                      <div class="input-group-button">
+                        <button type="submit" class="button">Submit</button>
+                      </div>
+                    </div>
+                  </form>
                 </li>
               </ul>
             </li>
@@ -96,7 +95,8 @@ export default {
 
   data() {
     return {
-      // mountains: [],
+      startDate: this.$store.state.startDate,
+      endDate: this.$store.state.endDate,
       years: [],
     }
   },
@@ -104,18 +104,37 @@ export default {
   computed: {
     mountains: {
       get() {
-        return this.$store.state.mountains
+        return this.$store.state.mountains;
       },
       set(value) {
-        this.$store.commit('updateMountains', value)
+        this.$store.commit('updateMountains', value);
       }
-    }
+    },
     // ...mapState({
     //   mountains: state => state.mountains
     // })
   },
 
   methods: {
+    onSubmitDateRange(e) {
+      // console.log('onSubmitDateRange', e);
+
+      const formData = new FormData(e.target);
+      const startDate = formData.get('startDate');
+      const endDate = formData.get('endDate');
+
+      // console.log('formData:', formData.get('startDate'), formData.get('endDate') );
+
+      this.startDate = startDate;
+      this.endDate = endDate;
+
+      this.$router.push({
+        query: {
+          startDate: this.startDate,
+          endDate: this.endDate,
+        }
+      });
+    },
     // onChangeMountainSelection(e) {
     //   console.log('onChangeMountainSelection', e.target);
 
@@ -124,27 +143,13 @@ export default {
   },
 
   watch: {
-    // mountains() {
-    //   console.log('Mountains changed:', this.mountains);
+    startDate(value) {
+      this.$store.commit('updateStartDate', value);
+    },
 
-    //   this.$router.push({
-    //     name: 'home',
-    //     params: {
-    //       mountains: this.mountains,
-    //       years: this.years,
-    //     },
-    //   });
-    // },
-
-    // years() {
-    //   this.$router.push({
-    //     name: 'home',
-    //     params: {
-    //       mountains: this.mountains,
-    //       years: this.years,
-    //     },
-    //   });
-    // }
+    endDate(value) {
+      this.$store.commit('updateEndDate', value);
+    }
   },
 
   mounted() {

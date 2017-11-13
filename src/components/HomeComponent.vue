@@ -1,7 +1,5 @@
 <template>
   <div class="home-component">
-    {{ mountains }}
-
     <chart-component :type="'line'" :chartData="chartData" :chartOptions="chartOptions" ></chart-component>
   </div>
 </template>
@@ -12,6 +10,8 @@ import moment from 'moment'
 import axios from 'axios'
 import ChartComponent from '@/components/ChartComponent'
 import { mapGetters, mapActions } from 'vuex'
+
+const DATE_FORMAT = 'YYYY-MM-DD';
 
 const colorMap = {
   MtHoodMeadowsBase: '#003F91', // getRandomColor(),
@@ -32,56 +32,82 @@ function getRandomColor() {
 
 export default {
   name: 'HomeComponent',
-  props: [
-    // 'mountains',
-    // 'years',
-  ],
-  // props: {
-  //   mountains: {
-  //     type: Array,
-  //     default() {
-  //       return [];
-  //     },
-  //   },
-  //   years: {
-  //     type: Array,
-  //     default() {
-  //       return [];
-  //     },
-  //   },
-  // },
-
-  computed: {
-    mountains: {
-      get() {
-
-        // console.log('GET MOUNTAINS - HELLS YEAH', this.$store.state.mountains);
-
-        // Now we just need get the chart data based on which mountains are selected
-
-        return this.$store.state.mountains
-      },
-      set(value) {
-        this.$store.commit('updateMountains', value)
-      }
-    }
-  },
   components: {
     ChartComponent,
   },
+  data() {
+    return {
+      observationData: [],
+      chartData: {},
+      chartOptions: {
+        scales: {
+          yAxes: [{
+            stacked: false,
+            gridLines: {
+              display: true,
+              color: "rgba(255,99,132,0.2)"
+            },
+            ticks: {
+              beginAtZero: true
+            }
+          }],
+          xAxes: [{
+            gridLines: {
+              display: false
+            }
+          }]
+        }
+      },
+    }
+  },
+  computed: {
+    mountains: {
+      get() {
+        // console.log('GET MOUNTAINS - HELLS YEAH', this.$store.state.mountains);
+        // Now we just need get the chart data based on which mountains are selected
+        return this.$store.state.mountains;
+      },
+      set(value) {
+        this.$store.commit('updateMountains', value);
+      }
+    },
+    startDate: {
+      get() {
+        return this.$store.state.startDate;
+      }
+    },
+    endDate: {
+      get() {
+        return this.$store.state.endDate;
+      }
+    }
+  },
   watch: {
     mountains() {
-      console.log('\nHomeComponent mountains changed:', this.mountains);
-
       if (!this.mountains.length) {
         return;
       }
 
+      this.updateChart();
+    },
+
+    startDate() {
+      this.updateChart();
+    },
+
+    endDate() {
+      this.updateChart();
+    }
+  },
+  methods: {
+    updateChart() {
       let chartLabels = [];
       let datasets = [];
 
+      let aggregatedData = this.aggregateObservationData();
+
       this.mountains.forEach((mtn) => {
-        let matchedData = _.filter(this.observationData, (dataObj) => {
+        let matchedData = _.filter(aggregatedData, (dataObj) => {
           return dataObj.location === mtn;
         });
 
@@ -107,7 +133,7 @@ export default {
         });
       });
 
-      console.log('chartLabels:', chartLabels);
+      // console.log('chartLabels:', chartLabels);
 
       this.chartData = {
         labels: chartLabels.reverse(),
@@ -115,122 +141,51 @@ export default {
       };
     },
 
-    years() {
-      console.log('\nHomeComponent years changed:', this.years);
-    }
-  },
-  methods: {
-    aggregateChartData(data) {
-      return new Promise((resolve, reject) => {
+    aggregateObservationData() {
+      const dataForSelectedMountains = this.getDataByMountain();
+      const dataInRange = this.getDataForDateRange(
+        this.startDate,
+        this.endDate,
+        dataForSelectedMountains
+      );
 
+      // console.log(`Aggregate data between ${this.startDate} - ${this.endDate}`);
+      // console.log('dataForSelectedMountains:', dataForSelectedMountains);
+      // console.log('dataInRange:', dataInRange);
+
+      return dataInRange;
+    },
+
+    getDataByMountain() {
+      return _.filter(this.observationData, (item) => {
+        return _.indexOf(this.mountains, item.location) !== -1;
+      });
+    },
+
+    getDataForDateRange(startDate, endDate, data) {
+      const startTimestamp = new Date(startDate).getTime();
+      const endTimestamp = new Date(endDate).getTime();
+
+      return _.filter(data, (item, i) => {
+        return item.timestamp >= startTimestamp && item.timestamp <= endTimestamp;
       });
     }
   },
 
   created() {
-    axios.get('/static/data/all/dailyObservationsData.json').then((res) => {
-
+    axios.get('/static/data/all/daily_snow_depth_observations.json').then((res) => {
       console.log('All data:', res.data);
 
       this.observationData = res.data;
     });
-
-    // Promise.all([
-    //   axios.get('/static/data/mt-hood/meadows/2014_2015.json'),
-    //   axios.get('/static/data/mt-hood/meadows/2015_2016.json'),
-    //   axios.get('/static/data/mt-hood/meadows/2016_2017.json'),
-    //   axios.get('/static/data/mt-hood/timberline/2014_2015.json'),
-    //   axios.get('/static/data/mt-hood/timberline/2015_2016.json'),
-    //   axios.get('/static/data/mt-hood/timberline/2016_2017.json'),
-    //   // axios.get('/static/data/mt-hood/skibowl/2014_2015.json'),
-    //   // axios.get('/static/data/mt-hood/skibowl/2015_2016.json'),
-    //   // axios.get('/static/data/mt-hood/skibowl/2016_2017.json'),
-    // ])
-    // .then(resArray => {
-
-    //   console.log('resArray:', resArray);
-
-    //   let observationData = _.map(resArray, (obj) => {
-    //     return obj.data;
-    //   });
-
-    //   this.observationData = _.flatten(observationData);
-
-    //   console.log('observationData', _.flatten(observationData) );
-
-    //   let chartLabels = _.map(resArray[0].data, (data, key) => {
-    //     return data.date;
-    //   });
-
-    //   let datasets = [];
-
-    //   resArray.forEach((res) => {
-    //     // console.log('res', res.data.location);
-
-    //     let year = null;
-    //     let data = _.map(res.data.data, (value, key) => {
-    //       if (!year) {
-    //         year = new Date(key).getFullYear();
-    //       }
-
-    //       return value.avg;
-    //     });
-
-    //     // console.log('Year', year);
-
-    //     datasets.push({
-    //       label: `${res.data.location} - ${year}`,
-    //       data: data.reverse(),
-    //       backgroundColor: 'rgba(0,0,0,0)',
-    //       borderColor: colorMap[res.data.location],
-    //       borderWidth: 1,
-    //       spanGaps: true
-    //     });
-    //   });
-
-    //   this.chartData = {
-    //     labels: chartLabels.reverse(),
-    //     datasets: datasets
-    //   };
-    // });
-  },
-
-  data() {
-    return {
-      observationData: [],
-      chartOptions: {
-        scales: {
-          yAxes: [{
-            stacked: false,
-            gridLines: {
-              display: true,
-              color: "rgba(255,99,132,0.2)"
-            },
-            ticks: {
-              beginAtZero: true
-            }
-          }],
-          xAxes: [{
-            gridLines: {
-              display: false
-            }
-          }]
-        }
-      },
-
-      chartData: {}
-    }
   },
 
   mounted() {
-    console.log('HomeComponent - mounted:', this.chartOptions);
-
     this.chartOptions = this.chartOptions;
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
   font-weight: normal;

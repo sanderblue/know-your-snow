@@ -39,20 +39,10 @@ export default {
 
   watch: {
     chartData() {
-      console.log('WATCH - chartData:', this.chartData);
-
-      // console.log('WATCH - chartOptions:', this.options);
-      // console.log('WATCH - this.chart:', this.chartVue);
-
-      // this.chart.data.labels = this.chartData.labels;
-      // this.chart.data.datasets = this.chartData.datasets;
+      // console.log('WATCH - chartData:', this.chartData);
 
       this.updateChart(this.chartData.labels, this.chartData.datasets);
     },
-
-    // chartOptions() {
-
-    // }
   },
 
   data() {
@@ -66,15 +56,15 @@ export default {
         maintainAspectRatio: false,
         legend: {
           display: true,
-          position: 'right'
+          position: 'bottom'
         }
       }
     }
   },
 
   mounted() {
-    console.log('Chart component props:', this._props);
-    console.log('TEST', Object.assign(this.defaultOptions, this.chartOptions));
+    // console.log('Chart component props:', this._props);
+    // console.log('TEST', Object.assign(this.defaultOptions, this.chartOptions));
 
     this.el = document.getElementById('chart');
 
@@ -104,7 +94,7 @@ export default {
 
   .chart-frame {
     position: relative;
-    /*width: 3000px;*/
+    /*width: 4000px;*/
     height: 500px;
   }
 
