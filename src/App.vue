@@ -115,6 +115,16 @@ export default {
     // })
   },
 
+  watch: {
+    startDate(value) {
+      this.$store.commit('updateStartDate', value);
+    },
+
+    endDate(value) {
+      this.$store.commit('updateEndDate', value);
+    }
+  },
+
   methods: {
     onSubmitDateRange(e) {
       // console.log('onSubmitDateRange', e);
@@ -140,16 +150,6 @@ export default {
 
     //   this.$store.commit('updateMountains', e.target.value)
     // }
-  },
-
-  watch: {
-    startDate(value) {
-      this.$store.commit('updateStartDate', value);
-    },
-
-    endDate(value) {
-      this.$store.commit('updateEndDate', value);
-    }
   },
 
   mounted() {

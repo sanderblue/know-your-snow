@@ -173,10 +173,15 @@ export default {
   },
 
   created() {
-    axios.get('/static/data/all/daily_snow_depth_observations.json').then((res) => {
+    // const dataUrl = '/static/data/all/daily_snow_depth_observations.json';
+    const dataUrl = 'http://localhost:4040/snow-depth/daily';
+
+    axios.get(dataUrl).then((res) => {
       console.log('All data:', res.data);
 
       this.observationData = res.data;
+
+      this.updateChart();
     });
   },
 

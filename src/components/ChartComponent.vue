@@ -24,7 +24,6 @@ export default {
     'type',
     'chartData',
     'chartOptions',
-
   ],
   methods: {
     updateChart(labels, datasets) {

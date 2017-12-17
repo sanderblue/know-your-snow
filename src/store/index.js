@@ -8,9 +8,9 @@ const debug = process.env.NODE_ENV !== 'production'
 
 export default new Vuex.Store({
   state: {
-    startDate: '2017-07-01', // arbitrary default for now
+    startDate: '2017-10-01', // arbitrary default for now
     endDate: moment().format('YYYY-MM-DD'), // arbitrary default for now
-    mountains: []
+    mountains: ['MtHoodMeadowsBase']
   },
   getters: {
     // getter functions go here
