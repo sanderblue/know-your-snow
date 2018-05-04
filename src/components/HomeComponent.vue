@@ -1,6 +1,6 @@
 <template>
   <div class="home-component">
-    <chart-component :type="'line'" :chartData="chartData" :chartOptions="chartOptions" ></chart-component>
+    <chart-component :type="'line'" :chartData="chartData" :chartOptions="chartOptions"></chart-component>
   </div>
 </template>
 
@@ -63,8 +63,6 @@ export default {
   computed: {
     mountains: {
       get() {
-        // console.log('GET MOUNTAINS - HELLS YEAH', this.$store.state.mountains);
-        // Now we just need get the chart data based on which mountains are selected
         return this.$store.state.mountains;
       },
       set(value) {
@@ -192,6 +190,11 @@ export default {
 </script>
 
 <style scoped>
+.home-component {
+  display: flex;
+  flex: 1;
+}
+
 h1, h2 {
   font-weight: normal;
 }

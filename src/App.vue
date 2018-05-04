@@ -1,7 +1,19 @@
 <template>
   <div id="app">
     <div class="row collapse expanded">
-      <div class="small-3 medium-6 columns">
+      <header class="header-main padding-left-1 padding-right-1">
+        <div class="header-inner">
+          <div class="app-title-text margin-bottom-0">
+            <i class="fa fa-snowflake-o" aria-hidden="true"></i>
+            <span>Know Your Snow</span>
+          </div>
+        </div>
+      </header>
+      <section class="main-content padding-2">
+        <router-view/>
+      </section>
+
+      <!-- <div class="small-3 medium-6 columns">
         <div class="app-title padding-left-1 padding-right-1">
           <div class="app-title-text margin-bottom-0">
             <i class="fa fa-snowflake-o" aria-hidden="true"></i>
@@ -27,7 +39,7 @@
                 </li>
               </ul>
             </li>
-            <!-- <li>
+            <li>
               <h5>Years</h5>
               <ul class="nested vertical menu padding-bottom-1">
                 <li>
@@ -48,7 +60,7 @@
                 </li>
                 <li>{{ years }}</li>
               </ul>
-            </li> -->
+            </li>
             <li>
               <h5>Date Range</h5>
               <ul class="nested vertical menu padding-bottom-1">
@@ -67,8 +79,8 @@
             </li>
           </ul>
         </aside>
-      </div>
-      <div class="small-13 medium-18 columns">
+      </div> -->
+      <!-- <div class="small-13 medium-18 columns">
         <header class="header-main padding-left-1 padding-right-1">
           <div class="header-inner">
             <ul class="menu align-right">
@@ -79,7 +91,7 @@
         <section class="main-content padding-2">
           <router-view/>
         </section>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
