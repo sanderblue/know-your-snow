@@ -1,0 +1,16 @@
+name: Release
+
+on:
+  schedule:
+    - cron:  '*/30 * * * *'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get snow data
+        shell: bash
+        run: |
+          curl -X GET \
+            -H 'x-api-key: ${{ .secrets.API_KEY }}' \
+            'https://knowyoursnow.com/v1/snow-depth'
